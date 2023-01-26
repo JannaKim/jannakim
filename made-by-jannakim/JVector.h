@@ -3,11 +3,8 @@
 #include <limits>
 #include <stdlib.h> 
 
-// reallocations should only happen at logarithmically growing intervals of size 
-// so that the insertion of individual elements at the end of the vector 
-// can be provided with amortized constant time complexity
+// backgrounds : std::vector
 
-// an allocator object to dynamically handle its storage needs.
 template < class T >
 class allocator
 {
@@ -49,16 +46,14 @@ public:
 			// head = new int[ nCapacity ]; realloc 있어서 calloc 이 더 좋은듯
 		}
 		else {
-			// if size is zero, the memory previously allocated at ptr is deallocated as if a call to free was made, and a null pointer is returned.
-			// allocating a new memory block of size new_size bytes, 
-			// copying memory area with size equal the lesser of the new and the old sizes, and freeing the old block.
+			// backgrounds : realloc
 			p = (T*)realloc( p, n * sizeof( value_type ) );
 		}
 		return p;
 	}
 	//	const T* allocate( long n );
 
-	void deallocate( pointer p, size_type n ) // n??
+	void deallocate( pointer p, size_type n ) // n?? 옛날 방식, 또는 new, delete 용
 	{
 		//for ( size_type i = 0; i < n; ++i ) {
 		//	free( p + i );
@@ -69,7 +64,6 @@ public:
 
 struct A;
 
-// size can change dynamically, with their storage being handled automatically by the container.
 // T is guaranteed to not throw while moving, 
 template < class T, class Alloc = allocator<T> >
 class vector // generic template
@@ -77,7 +71,7 @@ class vector // generic template
 
 	// 주의할 점은 realloc이 새로운 자리가 아니라 기존의 자리에서 그대로 늘어난 양만큼 추가를 하려고 하기 때문에 
 	//	기존의 배열 뒤로 자리가 없다면 0을 리턴하고 따로 배열의 주소를 보관해 두지 않았다면 그 주소를 영영 잃어버리게 된다.
-	//	그래서 사전에 따로 저장해 두고 0이 리턴되었는지 검사해서 복원 시켜주는 것에 신경 써야 한다.
+	//	그래서 사전에 따로 저장해 두고 0이 리턴되었는지 검사해서 복원 시켜주는 것에 신경 써야 한다. ??
 
 	//﻿int* array = 0;
 	//int* tempArray = 0;

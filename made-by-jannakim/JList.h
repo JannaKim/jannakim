@@ -1,28 +1,7 @@
 #pragma once
 #include <iostream>
 
-//sequence containers that allow constant time insertand erase
-//iteration in both directions.
-//doubly - linked lists
-//elements they contain in different and unrelated storage locations
-//better in inserting, extractingand moving elements in any position
-//lack direct access : takes linear time
-//extra memory to keep the linking information
-
-//// an allocator object to dynamically handle its storage needs.
-//template < class T >
-//class allocator // default면 벡터랑 통일해야할거같은데...
-//{
-//	T* pPrev;
-//	T* pNext;
-//	long nCapacity;
-//public:
-//
-//	allocator()
-//	{
-//
-//	}
-//};
+// backgrounds : std::list
 
 template < class T, class Alloc = allocator<T> >
 class list
@@ -37,52 +16,28 @@ class list
 
 	typedef T value_type;
 
-	// https://stackoverflow.com/questions/48969089/what-does-the-stdlist-do-with-its-allocator-argument
-	// allocator<T> 는 어디다 쓰는지?
-
-	// 답변 1
-	// Do we just drop the T allocator on the floor, or do we use it somehow ?
-
-	//Since C++11 allocators can be stateful.
-	//You want to construct your internal allocator using the user supplied one.
-	//An Allocator is explicitely required to be constructible from typename std::allocator_traits<Alloc>::template rebind_alloc<U>.
-
-	// 답변 2
-	// The T allocator is still used to construct() and destroy() the T portion of the internal nodes. 
-	// Using these operations may be necessary to add custom arguments during construction, 
-	// e.g., optionally forward a suitable allocator argument to the constructed objects.
+	 
+	// backgrounds : allocator<T> 는 어디다 쓰는지?
 
 	typedef Alloc value_allocator_type; // == typedef typename Alloc::template Rebind<T>::Other value_allocator_type;
 
-	// http://egloos.zum.com/sweeper/v/2966785    : std::list에 custom allocator 사용하려면 제공해야하는 필수 요소들
-	// - rebind라는 중첩(nested) 구조체 템플릿을 반드시 제공해야 한다
+	// backgrounds : rebind라는 중첩(nested) 구조체 템플릿
 
 	// 방법 1
-	// 내가쓰는 Alloc의 my_rebind 중첩 구조체 템플릿안에 typedef된 my_other란 타입을 가져온다. 
-	// typedef typename Alloc::template my_rebind<node<T>>::my_other node_allocator_type;
 	using node_allocator_type = typename
 		Alloc::template	my_rebind<node<value_type>>::my_other;
 
 
 	// 방법 2 : 방법 1 필수조건을 std::allocator_traits 에서 짜준다
-	// std::allocator_traits supplies a uniform interface to all allocator types 
-	// without *** enforcing the entire default allocator interface *** on every allocator type.
-
 	using value_alloc = typename
 		std::allocator_traits<Alloc>::template rebind_alloc<T>;
 	using node_alloc = typename
 		std::allocator_traits<Alloc>::template rebind_alloc<node<T>>;
 
-	// 1. default definitions of 9 member typedefs and 2 template alias declarations
-	// 2. default allocator_traits instantiation gives default implementations for 4 member functions, 
-	// including construct() and destroy(), which call placement new and the object destructor respectively.
-
 	typedef node_allocator_type allocator_type;
 	// typedef allocator<node<T>> allocator_type; // 이걸 선언할수는 있어도 안쓸수있어서 안됨
 
 	typedef value_type& reference;
-	// typedef pointer node*
-
 	typedef node<T>* pointer;
 
 
@@ -91,8 +46,6 @@ private:
 	pointer pHead;
 	pointer pTail;
 
-
-	// https://theotherbranch.wordpress.com/2012/12/13/using-the-standard-allocator-for-a-different-type-and-get-free-functionality-for-your-custom-allocator/
 public:
 	// default ( 1 ) empty container constructor (default constructor) 
 	// Constructs an empty container, with no elements.
@@ -106,11 +59,6 @@ public:
 	// since those are the only constructors that can be used in typecasting.
 
 
-	//The T allocator is still used to construct() and destroy() the T portion of the internal nodes.
-	//Using these operations may be necessary to add custom arguments during construction, 
-	//e.g., optionally forward a suitable allocator argument to the constructed objects.
-
-
 	// com1 == (Complex)3.0 만 가능
 	explicit list( const allocator_type& alloc = allocator_type() ) : m_allocator( alloc ) //????
 		, pHead( nullptr ), pTail( nullptr )
@@ -118,22 +66,7 @@ public:
 
 	}
 
-
-	// Iterators:
-	// begin	Return iterator to beginning (public member function)
-	// for (it=mylist.begin(); it!=mylist.end(); ++it)
-
 	// for (std::list<int>::iterator it=mylist.begin(); it != mylist.end(); ++it)
-	//namespace iterator
-	//{
-	//	iterator begin() noexcept; 
-	//	const_iterator begin() const noexcept;
-	//	iterator end() noexcept; 
-	//	const_iterator end() const noexcept;
-	//};
-
-
-
 	struct iterator
 	{
 		pointer pNode;
