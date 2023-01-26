@@ -75,7 +75,7 @@ void test_JList()
 
 	sort( lTest.begin(), lTest.end() );
 
-	for ( auto it2 : lTest ) {
+	for ( long it2 : lTest ) { // 내부에서 iterator begin() , end(), !=, ++ 로 돌리지만 it2는 * 연산자 적용되어서 만들어진다
 		std::cout << it2 << '\n';
 	}
 
@@ -97,13 +97,13 @@ void test_JVector()
 	//for ( long i = 3; i < 50; ++i )
 	//	//std::cout << vTest[ i - 1 ] << '\n';
 
-	for ( auto it2 : vTest ) {
+	for ( long it2 : vTest ) {
 		std::cout << it2 << '\n';
 	}
 
 	sort( vTest.begin(), vTest.end() );
 
-	for ( auto it2 : vTest ) {
+	for ( long it2 : vTest ) {
 		std::cout << it2 << '\n';
 	}
 }

@@ -214,7 +214,7 @@ public:
 
 	iterator begin() noexcept
 	{
-		return pHead;
+		return pHead; // iterator( pointer p ) 생성자 타서 이터레이터로 만들어진다
 	}
 	//const_iterator begin() const noexcept;
 	iterator end() noexcept
