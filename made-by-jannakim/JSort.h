@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 #include <iostream>
 
 template <class RandomAccessIterator>
@@ -19,7 +20,7 @@ void sort( RandomAccessIterator first, RandomAccessIterator last )
 			auto right = it2;
 			if ( right != last && right < left ) {
 				auto temp = *left;
-				*left = *right;
+				*left = *right; // left = *right; 시 operator=( const value_type& val ) 동작, 아니면 이 연산자 오버로딩은 한 번도 쓰이지 않음 
 				*right = temp;
 			}
 			--it2;

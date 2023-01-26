@@ -155,7 +155,7 @@ public:
 		}
 
 		//대입 연산자2
-		pointer operator=( const value_type& val )
+		pointer operator=( const value_type& val ) // 쓰이지 않으면 디버깅이 안잡히는 것 같다 = 코드가 위로 밀리는 문제 ? 
 		{// prev, next 그대로, 내용물만 바꿈
 			pNode->mData = val;
 			return pNode;
