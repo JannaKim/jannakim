@@ -174,7 +174,7 @@ public:
 
 	//  Modifiers:
 	// push_back	Add element at the end (public member function)
-	void push_back( const value_type& val )
+	void push_back( const T& val )
 	{
 		node<T>* pNewNode = m_allocator.allocate( 1 );
 
@@ -187,9 +187,25 @@ public:
 		pTail->pPrev = pNewNode;
 
 		pNewNode->mData = val;
+
+		if ( pHead == pTail )
+			pHead = pNewNode;
 	}
 	void push_back( T&& val ) { // rvalue 참조 선언자
+		node<T>* pNewNode = m_allocator.allocate( 1 );
 
+		if ( pTail->pPrev )
+			pTail->pPrev->pNext = pNewNode;
+
+		pNewNode->pPrev = pTail->pPrev;
+		pNewNode->pNext = pTail;
+
+		pTail->pPrev = pNewNode;
+
+		pNewNode->mData = val;
+
+		if ( pHead == pTail )
+			pHead = pNewNode;
 	}
 
 	// push_front	Insert element at beginning( public member function )
@@ -204,7 +220,18 @@ public:
 
 		pHead->mData = val;
 	}
-	void push_front( value_type&& val );
+
+	void push_front( value_type&& val ) 
+	{
+		node<T>* pNewNode = m_allocator.allocate( 1 );
+		pHead->pPrev = pNewNode;
+		pNewNode->pNext = pHead;
+
+		pHead = pNewNode;
+		pHead->pPrev = nullptr;
+
+		pHead->mData = val;
+	}
 
 	// pop_back	Delete last element (public member function)
 	void pop_back()

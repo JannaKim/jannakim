@@ -153,3 +153,41 @@ list
 iterator& operator++
 
 next가 없다면 어떤 처리 하는 지 보기
+
+
+lvalue :
+1. 등호 왼쪽에 올 수 있다
+2. 이름이 있고, 단일식을 벗어나서 사용가능
+3. 주소 연산자로 주소를 구할 수 있다
+4. 참조를 반환하는 함수
+문자열 literal
+
+rvalue :
+1. 등호 왼쪽에 올 수 없다
+2. 이름이 없고, 단일 식에서만 사용
+3. 주소연산자로 주소를 구할 수 없다
+4. 값을 반환 하는 함수
+실수/정수 literal
+임시객체 (temporary)
+
+
+c1 = 10
+
+10은 코드 메모리에
+
+value_category로 조사
+
+++n lvalue
+n++ rvalue
+"AA" value
+
+https://n-learning.ispringlearn.com/content/info/7196?vc_cik=90209863-jX3Ps-BvLYv-338Zv&vc_lpid=7196
+
+&& rvalue refernce
+l, r 모두 가리킬 수 있다
+
+
+int&& r = 3;
+상수성 없이 rvalue를 가리키는 것이 중요하다
+move semantics, perfect forwarding 을 위해서
+

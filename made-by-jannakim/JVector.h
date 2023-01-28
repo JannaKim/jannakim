@@ -243,8 +243,8 @@ public:
 		return fabs( a - b ) < std::numeric_limits<double>::epsilon();
 	}
 
-	// Element access:
-	// push_back 	Add element at the end (public member function)
+	 //Element access:
+	 //push_back 	Add element at the end (public member function)
 	void push_back( const value_type& val ) {
 		size_type nCapacityPrev = nCapacity;
 
@@ -255,18 +255,56 @@ public:
 		pEnd = pHead + nSize - 1;
 		*( pEnd ) = val;
 	}
-	//void push_back( value_type&& val ) {
+	void push_back( value_type&& val ) { // rvalue reference. It binds to temporaries without making a copy
 
-	//		// This effectively increases the container size by one, 
-	//		// which causes an automatic reallocation of the allocated storage space if - and only if - 
-	//		// the new vector size surpasses the current vector capacity.
-	//	*pEnd = val;
-	//}
+			// This effectively increases the container size by one, 
+			// which causes an automatic reallocation of the allocated storage space if - and only if - 
+			// the new vector size surpasses the current vector capacity.
+		size_type nCapacityPrev = nCapacity;
+
+		++nSize;
+
+		reserve( nSize );
+
+		pEnd = pHead + nSize - 1;
+		*( pEnd ) = val;
+	}
 
 	// pop_back  Delete last element (public member function)
 };
 
-struct A
+struct TESTRVRef
 {
-	A( A&& ) {} // 이동 생성자
+	long a;
+	long b = 9;
+	TESTRVRef( long&& _a ) : a( -_a ) //  rvalue reference : binds to temporaries without making a copy.
+	{
+	
+	} 
+
+	TESTRVRef( long& _a ) : a( _a )
+	{
+
+	}
+};
+
+struct TestEmptyStruct
+{
+	long* a;
+	allocator<long> m_allocator;
+	TestEmptyStruct( long&& _a )
+	{
+		a = m_allocator.allocate( 1 );
+		*a = -_a;
+	}
+
+	//TestEmptyStruct( long& _a ) : a( _a )
+	//{
+
+	//}
+
+	struct rebind
+	{
+
+	};
 };
