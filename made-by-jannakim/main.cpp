@@ -55,13 +55,13 @@ void test_JList()
 	std::cout << "test list\n";
 
 	list<long> lTest;
-	for ( long i = 0; i < 4; ++i )
-		lTest.push_back( i );
-	for ( long i = 6; i > 0; --i )
+	for ( long i = 0; i < 6; ++i )
 		lTest.push_front( i );
-	for ( long i = 0; i < 3; ++i )
-		lTest.pop_back();
+	for ( long i = 4; i > 0; --i )
+		lTest.push_back( i );
 	for ( long i = 0; i < 2; ++i )
+		lTest.pop_back();
+	for ( long i = 0; i < 3; ++i )
 		lTest.pop_front();
 
 	list<long>::iterator it = lTest.begin();

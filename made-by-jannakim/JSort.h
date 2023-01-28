@@ -19,7 +19,7 @@ void sort( RandomAccessIterator first, RandomAccessIterator last )
 			++it2;
 			RandomAccessIterator right = it2;
 			if ( right != last && right < left ) {
-				RandomAccessIterator temp = *left;
+				auto temp = *left;
 				*left = *right; // left = *right; 시 operator=( const value_type& val ) 동작, 아니면 이 연산자 오버로딩은 한 번도 쓰이지 않음 
 				*right = temp;
 			}
@@ -32,6 +32,6 @@ void sort( RandomAccessIterator first, RandomAccessIterator last )
 
 
 
-template <class RandomAccessIterator, class Compare>  void
-sort( RandomAccessIterator first, RandomAccessIterator last, Compare comp );
+template <class RandomAccessIterator, class Compare>  
+void sort( RandomAccessIterator first, RandomAccessIterator last, Compare comp );
 
