@@ -4,7 +4,7 @@
 #include <stdlib.h> 
 
 // backgrounds : std::vector
-
+struct TESTRVRef;
 template < class T >
 class allocator
 {
@@ -159,11 +159,10 @@ public:
 			return *pEl;
 		}
 
-		//value_type* operator->()
-		//{
-		//	std::cout << "operator*()";
-		//	return &( pNode->mData );
-		//}
+		value_type* operator->() // used with pointers to access the class or struct variables : ptr->marks = 92;
+		{
+			return pEl; // ??
+		}
 
 		bool operator!=( const iterator& b ) const
 		{
@@ -279,13 +278,46 @@ struct TESTRVRef
 	long b = 9;
 	TESTRVRef( long&& _a ) : a( -_a ) //  rvalue reference : binds to temporaries without making a copy.
 	{
-	
-	} 
+
+	}
 
 	TESTRVRef( long& _a ) : a( _a )
 	{
 
 	}
+
+	TESTRVRef() {}
+
+	operator TESTRVRef* ()  // std::cout << &TESTRVRef ~  , if ( A )
+	{
+		// a.operator A*() results in a pointer to a.
+		return this; 
+	} // ??
+
+	////포인터 연산자 오버로딩
+	//TESTRVRef& operator*()
+	//{
+	//	return *this; // 비 const 에 대한 참조는 rvalue여야 합니다
+	//}
+
+
+	//포인터 연산자 오버로딩
+	TESTRVRef& operator*()
+	{
+		return *this; // 비 const 에 대한 참조는 lvalue여야 합니다 ? 
+	}
+
+	bool operator()( long tmp = 1 )
+	{
+	//  https://stackoverflow.com/questions/317450/why-override-operator
+	//	One of the primary goal when overloading operator() is to create a functor.
+	//	A functor acts just like a function, but it has the advantages that it is stateful, 
+	//	meaning it can keep data reflecting its state between calls.
+		return true;
+	}
+
+	//BOOL _TransparencyControlLock::operator()( LONG nSkillID )
+	//_TransparencyControlLock()( MECHANIC_OPEN_GATE )
 };
 
 struct TestEmptyStruct

@@ -191,3 +191,23 @@ int&& r = 3;
 상수성 없이 rvalue를 가리키는 것이 중요하다
 move semantics, perfect forwarding 을 위해서
 
+overloading 규칙
+1. 값 타입과 참조타입은 같이 오버로딩 될 수 없다
+
+foo( X&& x)
+move semantics를 사용하겠다는 의도
+rvalue만 받을 수 있다
+
+reserve 구현도 보기
+
+
+foo(static_cast<X&&>(rx)); // 타입이 아닌 value를 변환하는 캐스팅 : lvalue-> rvalue를 캐스팅
+
+reference collapsing
+https://n-learning.ispringlearn.com/content/info/7196?vc_cik=90209863-bsgKt-JYKwK-PyQHx&vc_lpid=7196
+
+
+
+https://stackoverflow.com/questions/30123338/use-operator-t-instead-of-t-operator-for-member-access
+
+

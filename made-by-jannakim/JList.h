@@ -129,12 +129,15 @@ public:
 			return pNode->mData;
 		}
 
-		// ?? ¾µ¸ð?
-		//value_type* operator->()
-		//{
-		//	std::cout << "operator*()";
-		//	return &( pNode->mData );
-		//}
+		T* operator->() // used with pointers to access the class or struct variables : ptr->marks = 92;
+		{
+		//https://stackoverflow.com/questions/30123338/use-operator-t-instead-of-t-operator-for-member-access
+
+		//The expression x->y requires x to be a pointer to complete class type, 
+		//	or when x is an instance of a class, requires operator->() defined for x
+
+			return &pNode->mData; // ??
+		}
 
 		bool operator!=( const iterator& b ) const
 		{

@@ -11,22 +11,25 @@
 #include "JSort.h"
 
 
-
-
+template < class T >
+void print( T line )
+{
+	std::cout << line << std::endl; // operator TESTRVRef* () 
+	std::cout << *line << std::endl; // ?? operator*()
+	std::cout << line.a << std::endl;
+	std::cout << line[0] << std::endl;
+	//std::cout << *line[ 0 ] << std::endl;// operator TESTRVRef* () -> long& operator*()
+}
 
 void test_JVector();
 void test_JList();
-
+void test_operator_overloads();
 
 int main()
 {
-	test_JVector();
-	test_JList();
-
-
-
-	//test_movelist();
-
+	//test_JVector();
+	//test_JList();
+	test_operator_overloads();
 }
 
 //1. vector 가변 크기 배열
@@ -49,6 +52,31 @@ int main()
 //
 //4. 알고리즘
 //>> 버블 정렬 - 범용적인 알고리즘 작성이 목적이기에 어려운 알고리즘이 아닌 간단한 정렬 알고리즘으로
+
+void test_operator_overloads()
+{
+	TESTRVRef A( 5 ); // A = {a=-5 b=9 }
+	print( A );
+
+	A(); // bool operator()( long tmp = 1)
+
+	if ( A ) // operator TESTRVRef* () 
+		std::cout << "A" << std::endl;
+	if ( A() ) // bool operator()( long tmp = 1)
+		std::cout << "A()" << std::endl;
+
+	if ( A( 2 ) ) // bool operator()( long tmp = 1)
+		std::cout << "A(2)" << std::endl;
+
+	if ( A.operator()( 3 ) ) // bool operator()( long tmp = 1)
+		std::cout << "A.operator()(3)" << std::endl;
+
+	if ( (A)( 4 ) ) // bool operator()( long tmp = 1)
+		std::cout << "(A)( 4 )" << std::endl;
+
+	if ( TESTRVRef()( 5 ) ) // 임시객체 + bool operator()( long tmp = 1)
+		std::cout << "TESTRVRef()(5)" << std::endl;
+}
 
 void test_JList()
 {
@@ -106,7 +134,22 @@ void test_JList()
 	}
 
 
+	std::cout << "test list : std::list, list operator->() \n";
 
+	std::list<TESTRVRef> my_list;
+	my_list.emplace_back( 2 );
+
+	std::list<TESTRVRef>::iterator std_it = my_list.begin();
+	std::cout << std_it->a << std::endl;
+	std::cout << ( *std_it ).a << std::endl;
+
+	list<TESTRVRef> my_list2;
+	//my_list.emplace_back( 3 );
+	my_list2.push_back( 3 );
+
+	list<TESTRVRef>::iterator it2 = my_list2.begin();
+	std::cout << it2->a << std::endl;
+	std::cout << ( *it2 ).a << std::endl;
 }
 void test_JVector()
 {
