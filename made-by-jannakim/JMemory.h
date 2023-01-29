@@ -75,29 +75,31 @@ public:
 	}
 };
 
+template <class T>
+struct ControlBlock
+{
+	long use_count;
+	long weak_count;
+	T* mData; // 내부적으로 객체의 주소를 보관하기 위해 포인터 멤버를 가지고 있다
+	ControlBlock() : use_count( 0 ), weak_count( 0 )
+	{
+
+	}
+	~ControlBlock()
+	{
+	}
+	// allocator
+	// deleter
+};
+
+template <class T>
+class weak_ptr;
+
 // Managed pointers
 template <class T> 
 class shared_ptr
 {
 	T* mData;
-
-	template <class T>
-	struct ControlBlock
-	{
-		long use_count;
-		long weak_count;
-		T* mData; // 내부적으로 객체의 주소를 보관하기 위해 포인터 멤버를 가지고 있다
-		ControlBlock() : use_count(0), weak_count(0)
-		{
-
-		}
-		~ControlBlock()
-		{
-			delete mData;
-		}
-		// allocator
-		// deleter
-	};
 
 	//Manages the storage of a pointer, providing a limited garbage - collection facility, 
 	//possibly sharing that management with other objects.
@@ -120,10 +122,9 @@ public:
 public:
 	// 생성/복사/대입/소멸을 관리할 수 있다
 
-	// std::shared_ptr<int> p1;
 	constexpr shared_ptr() noexcept
 	{
-		m_controlblock = new ControlBlock;
+		m_controlblock = new ControlBlock<T>;
 
 		m_controlblock->use_count = 0;
 	}
@@ -143,19 +144,23 @@ public:
 	// copy constructor
 	shared_ptr( /*const */shared_ptr& x ) noexcept // 같은 거 들어왔을 때. 왜 const?
 	{
-		m_controlblock = x.GetControlBlock();
+		m_controlblock = x.m_controlblock;
 		++m_controlblock->use_count;
+		mData = m_controlblock->mData;
 	}
 	
 	// with deleter
-	template <class U, class D> shared_ptr( U* p, D del ); 
-	
+	template <class U, class D> shared_ptr( U* p, D del );
+
 	template <class D> shared_ptr( nullptr_t p, D del );
 
-
-	ControlBlock<T>* GetControlBlock()
+	// from weak
+	template <class T > 
+	explicit shared_ptr( const weak_ptr<T>& x )
 	{
-		return m_controlblock;
+		m_controlblock = x.m_controlblock;
+		++m_controlblock->use_count;
+		mData = m_controlblock->mData;
 	}
 
 	template <class U> 
@@ -169,7 +174,12 @@ public:
 		--m_controlblock->use_count;
 
 		if ( !m_controlblock->use_count ) {
-			delete m_controlblock->mData;
+			delete mData;               
+			
+		}
+
+		if ( m_controlblock->use_count + m_controlblock->weak_count == 0 ) {
+			// 제어 블록 파괴
 			delete m_controlblock;
 		}
 	}
@@ -185,13 +195,29 @@ public:
 		*mData;
 	}
 
-	// copy
+	// 대입 연산자
 	shared_ptr& operator= ( const shared_ptr& x ) noexcept
 	{
+		if ( m_controlblock != x.m_controlblock ) {
+			--m_controlblock->use_count;
 
+			if ( !m_controlblock->use_count ) {
+				 delete mData;           
+
+			}
+
+			if ( m_controlblock->use_count + m_controlblock->weak_count == 0 ) {
+				// 제어 블록 파괴
+				delete m_controlblock;
+			}
+
+			m_controlblock = x.m_controlblock;
+		}
+		return *this;
 	}
 
-	template <class U> shared_ptr& operator= ( const shared_ptr<U>& x ) noexcept;
+	template <class U> // 다른 객체 들어오는 경우인 듯
+	shared_ptr& operator= ( const shared_ptr<U>& x ) noexcept;
 
 	// move
 	shared_ptr& operator= ( shared_ptr&& x ) noexcept; 
@@ -206,4 +232,77 @@ public:
 
 
 template <class T> 
-class weak_ptr;
+class weak_ptr
+{	T* mData;
+
+public:
+	ControlBlock<T>* m_controlblock;
+	
+	// Member functions
+public:
+
+	// default
+	constexpr weak_ptr() noexcept
+   {
+		m_controlblock = new ControlBlock<T>;
+
+		m_controlblock->weak_count = 0;
+   }
+
+	// copy
+	weak_ptr( const weak_ptr& x ) noexcept; 
+	template <class U> weak_ptr( const weak_ptr<U>& x ) noexcept;
+
+	// from shared_ptr
+	template <class U> weak_ptr( const shared_ptr<U>& x ) noexcept
+	{
+		m_controlblock = x.m_controlblock;
+		++m_controlblock->weak_count;
+		mData = m_controlblock->mData;
+	}
+
+	~weak_ptr()
+	{
+		--m_controlblock->weak_count;
+
+		if ( m_controlblock->use_count + m_controlblock->weak_count == 0 ) {
+			// 제어 블록 파괴
+			delete m_controlblock;
+		}
+	}
+
+	T* operator->() const noexcept // ??
+	{
+		return mData;
+	}
+
+	T& operator*() const noexcept
+	{
+		*mData;
+	}
+
+	// 대입 연산자 : from shared_ptr
+	template <class U> 
+	weak_ptr& operator=( const shared_ptr<U>& x ) noexcept
+	{
+		// error C2662: 'shared_ptr<Car>::ControlBlock<T> *shared_ptr<T>::GetControlBlock(void)': 'this' 포인터를 'const shared_ptr<Car>'에서 'shared_ptr<Car> &'(으)로 변환할 수 없습니다.
+		if ( m_controlblock != x.m_controlblock ) {
+			if ( m_controlblock ) {
+				--m_controlblock->weak_count;
+
+				if ( m_controlblock->use_count + m_controlblock->weak_count == 0 ) {
+					// 제어 블록 파괴
+					delete m_controlblock;
+				}
+			}
+			m_controlblock = x.m_controlblock;
+			++m_controlblock->weak_count;
+		}
+		return *this;
+	}
+
+	bool expired() const noexcept
+	{
+		return m_controlblock->use_count;
+	}
+};

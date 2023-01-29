@@ -4,54 +4,125 @@
 #include <list>
 #include <memory> // 표준은 아니지만 컴파일러가 global namespace에도 제공함
 
-
-
 #include "JVector.h"
 #include "JList.h"
 #include "JSort.h"
-
+#include "JMemory.h"
 
 template < class T >
 void print( T line )
 {
 	std::cout << line << std::endl; // operator TESTRVRef* () 
-	std::cout << *line << std::endl; // ?? operator*()
-	std::cout << line.a << std::endl;
-	std::cout << line[0] << std::endl;
+	//std::cout << *line << std::endl; // ?? operator*()
+	//std::cout << line.a << std::endl;
+	//std::cout << line[0] << std::endl;
 	//std::cout << *line[ 0 ] << std::endl;// operator TESTRVRef* () -> long& operator*()
 }
 
 void test_JVector();
 void test_JList();
+void test_JList2();
 void test_operator_overloads();
+void test_smart_pointer_std();
+void test_smart_pointer_custom();
+
 
 int main()
 {
 	//test_JVector();
 	//test_JList();
-	test_operator_overloads();
+	//test_JList2();
+	// test_operator_overloads();
+
+	// test_smart_pointer_std();
+	test_smart_pointer_custom();
+
 }
 
-//1. vector 가변 크기 배열
-//>> push_back
-//>> pop_back
-//>> resize
-//>> [] 접근
-//
-//2. list 양방향 리스트
-//>> push_back
-//>> push_front
-//>> pop_back
-//>> pop_front
-//
-//3. iterator*
-//>> ++, --
-//>> *연산자
-//>> 비교 연산자
-//>> 동일한 다른 컨테이너에 접근 가능, it = A.begin(), it = B.begin()
-//
-//4. 알고리즘
-//>> 버블 정렬 - 범용적인 알고리즘 작성이 목적이기에 어려운 알고리즘이 아닌 간단한 정렬 알고리즘으로
+class Car
+{
+	int color;
+public:
+	Car() : color( 0 ) {}
+	~Car() { std::cout << "~Car()\n"; }
+
+	void Go() { std::cout << "Car go\n"; }
+};
+
+// delete 오버로딩?
+void* operator new ( size_t size )
+{
+	std::cout << "new size :" << size << std::endl;
+	return malloc( size );
+}
+
+//template<class T>
+//void* operator delete ( T p )
+//{
+//	std::cout << "delete size :" << size << std::endl;
+//	return free( p );
+//}
+
+void foo( Car* p )
+{
+	print( "delete Car" );
+}
+void test_smart_pointer_std()
+{
+	//  Tools > Options > Debugging > General, "Enable Just My Code" unticked
+
+	// Car* p = new Car;
+	std::shared_ptr<Car> p( new Car ); // 포인터가 아니라 객체, 내부적으로 Car의 주소를 보관
+	// 객체니까 소멸자를 부를것
+
+
+
+	int a = 0; // copy initialization
+	int b( 0 ); // direct initialization
+
+	// std::shared_ptr<Car> p3 = new Car; // error explicit 있으면 이렇게 쓸 수 없다
+	std::shared_ptr<Car> p3( new Car ); // explicit 생성자
+
+	std::shared_ptr<Car> p4 = p3;
+
+	std::shared_ptr<Car> p5( new Car, foo );
+	std::shared_ptr<Car> p6( new Car, []( Car* p ) { delete p; } );
+
+
+	// make_shared : 대상 객체와 제어블록 메모리를 동시에 이어서 할당
+
+	std::shared_ptr<Car> p1 = std::make_shared<Car>();
+
+	std::weak_ptr<Car> wp;
+	{
+		std::shared_ptr<Car> sp( new Car );
+		wp = sp;
+	} // Car 객체 파괴되지만 제어블록은 파괴되지 않는다. weak 땜에
+
+	if ( wp.expired() ) {
+		// 제어블록이 파괴되는 시점은 sp, wp 모두 없을 때
+	}
+
+}
+void test_smart_pointer_custom()
+{
+	
+	{
+		shared_ptr<long> p2( new long( 1 ) ); // 스마트 포인터 한 번에 new 두번
+		shared_ptr<long> p22 = p2;
+	}
+
+	weak_ptr<Car> wp2;
+	{
+		shared_ptr<Car> sp( new Car );
+		wp2 = sp;
+	} // Car 객체 파괴되지만 제어블록은 파괴되지 않는다. weak 땜에
+
+	if ( wp2.expired() ) {
+		// 제어블록이 파괴되는 시점은 sp, wp 모두 없을 때
+	}
+
+}
 
 void test_operator_overloads()
 {
@@ -107,6 +178,10 @@ void test_JList()
 		std::cout << it2 << '\n';
 	}
 
+}
+
+void test_JList2()
+{
 	std::cout << "test list : rvalue reference, custom struct \n";
 
 	long v = 1;
