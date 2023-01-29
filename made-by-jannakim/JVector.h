@@ -2,65 +2,11 @@
 #include <iostream>
 #include <limits>
 #include <stdlib.h> 
+#include "JMemory.h"
 
 // backgrounds : std::vector
 struct TESTRVRef;
-template < class T >
-class allocator
-{
-public:
-	typedef T value_type;
-	typedef T* pointer; // 필수
-	typedef const T* const_pointer;
-	typedef T& reference; // 필수
-	typedef const T& const_reference;
-	typedef long size_type;
 
-public:
-
-	allocator()
-	{
-	}
-
-	template<typename U>
-	struct my_rebind
-	{
-		typedef allocator<U> my_other;
-	};
-
-	//Either 0 or a value previously obtained by another call to allocate and not yet freed with deallocate.
-	//When it is not 0,
-	//this value may be used as a hint 
-	//to improve performance by allocating the new block near the one specified.
-	//The address of an adjacent element is often a good choice.
-	pointer allocate( size_type n ) // , allocator<void>::const_pointer hint = 0 ) ???
-	{
-		return (pointer)calloc( n, sizeof( value_type ) );
-	}
-
-	// allocate 인자로는 바이트 수가 아닌, 필요한 T 객체의 개수를 매개변수로 넘긴다.
-	pointer reallocate( pointer p, size_type n )
-	{
-		if ( p == nullptr ) {
-			p = allocate( n );
-			// head = new int[ nCapacity ]; realloc 있어서 calloc 이 더 좋은듯
-		}
-		else {
-			// backgrounds : realloc
-			p = (T*)realloc( p, n * sizeof( value_type ) );
-		}
-		return p;
-	}
-	//	const T* allocate( long n );
-
-	void deallocate( pointer p, size_type n ) // n?? 옛날 방식, 또는 new, delete 용
-	{
-		//for ( size_type i = 0; i < n; ++i ) {
-		//	free( p + i );
-		//}
-		free( p );
-	}
-};
 
 struct A;
 

@@ -73,6 +73,17 @@ public:
 
 	}
 
+	~list()
+	{
+		do {
+			node<T>* pOldHead = pHead;
+			pHead = pHead->pNext;
+			m_allocator.deallocate( pOldHead, 1 );
+
+		} while ( pHead );
+		pTail = nullptr;
+	}
+
 	// for (std::list<int>::iterator it=mylist.begin(); it != mylist.end(); ++it)
 	struct iterator
 	{
