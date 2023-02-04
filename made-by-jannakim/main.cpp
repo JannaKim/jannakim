@@ -3,6 +3,7 @@
 #include <winuser.h>
 #include <list>
 #include <memory> // 표준은 아니지만 컴파일러가 global namespace에도 제공함
+#include <thread>
 
 #include "JVector.h"
 #include "JList.h"
@@ -24,6 +25,7 @@ void test_JList();
 void test_JList2();
 void test_operator_overloads();
 void test_smart_pointer_std();
+void test_smart_pointer_std_advanced();
 void test_smart_pointer_custom();
 
 
@@ -35,33 +37,97 @@ int main()
 	// test_operator_overloads();
 
 	// test_smart_pointer_std();
-	test_smart_pointer_custom();
-
+	//test_smart_pointer_custom();
+	test_smart_pointer_std_advanced();
 }
 
 class Car
 {
 	int color;
 public:
-	Car() : color( 0 ) {}
-	~Car() { std::cout << "~Car()\n"; }
+	Car() : color( 0 ) { std::cout << "Car()\n"; }
+	~Car() { 
+		std::cout << "~Car()\n"; 
+	}
 
-	void Go() { std::cout << "Car go\n"; }
+	void Go() { 
+		std::cout << "Car go\n"; 
+	}
 };
+
+class Worker : public std::enable_shared_from_this<Worker> // CRTP
+{
+	Car c;
+	// Worker 객체는 새로운 스로데드 종료 됐을 때 파괴 돼야 한다
+	// == Worker객체가 자기자신의 참조계수를 증가 해야 한다
+	std::shared_ptr<Worker> holdMe;
+
+public:
+	Worker() { std::cout << "Worker()\n"; }
+
+	~Worker() { 
+
+		std::cout << "~Worker()\n"; 
+	}
+
+	void Run()
+	{
+		holdMe = shared_from_this(); // CRTP 기술 : this를 가지고 제어블록을 공유하면 shared_ptr를 만들 수 있게 한다
+		// 만들어져있지 않으면 undefined 동작
+		std::thread t( &Worker::Main, this );
+		t.join();
+		//t.detach(); 같이 쓰면 안됨
+	}
+
+	//모양이 안예쁨
+	void Run2(std::shared_ptr<Worker>& p)
+	{
+		// holeMe = this; // 제어블록 없는 독립적인 객체 넣는거라 다른 포인터가 만들어져서 안된다
+		holdMe = p;
+		std::thread t( &Worker::Main, this );
+		t.join();
+		//t.detach(); 같이 쓰면 안됨
+
+		// What is different between join() and detach() for multi threading in C++ ?
+		// https://stackoverflow.com/questions/37015775/what-is-different-between-join-and-detach-for-multi-threading-in-c
+
+
+	}
+
+	void Main()
+	{
+		std::cout << "Start thread\n";
+		c.Go();                                                            // 3 : Do() 들어가긴 하지만 Car go 출력 x : 이미 파괴되어서
+		std::cout << "finish thread\n";
+
+		holdMe.reset();
+	}
+};
+
+void test_smart_pointer_std_advanced()
+{
+	{
+		std::shared_ptr<Worker> myWorker = std::make_shared<Worker>();
+		myWorker->Run();                                                   // 1
+		//myWorker->Run2( myWorker ); // //모양이 안예쁨
+	}                                                                      // 2 : ~Worker(), ~Car()
+	
+	// Blocks the current thread until the thread identified by *this finishes its execution.
+
+}
 
 // delete 오버로딩?
 void* operator new ( size_t size )
 {
-	std::cout << "new size :" << size << std::endl;
+	std::cout << "New operator overloading, new size :" << size << std::endl;
 	return malloc( size );
 }
 
-//template<class T>
-//void* operator delete ( T p )
-//{
-//	std::cout << "delete size :" << size << std::endl;
-//	return free( p );
-//}
+void operator delete( void* p )
+{
+	std::cout << "Delete operator overloading\n";
+	free( p );
+}
 
 void foo( Car* p )
 {
@@ -104,6 +170,7 @@ void test_smart_pointer_std()
 	}
 
 }
+
 void test_smart_pointer_custom()
 {
 	

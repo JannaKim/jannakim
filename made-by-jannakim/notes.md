@@ -211,3 +211,78 @@ https://n-learning.ispringlearn.com/content/info/7196?vc_cik=90209863-bsgKt-JYKw
 https://stackoverflow.com/questions/30123338/use-operator-t-instead-of-t-operator-for-member-access
 
 
+S-_counted_deleter?
+
+new[] 시 반드시 삭제자를 변경해야 한다
+[] 연산자가 제공되지 않는다
+ - vector, 또는 array를 사용 권장
+
+ 
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+3주차
+
+unique_ptr : 복사 불가능
+
+explicit unique_ptr(pointer _Ptr) : 
+
+std::unique_ptr<myClass> myClass(new myClass());
+std::unique_ptr<myClass> myClass2 = std::make_unique<myClass>(); // due to exception safety
+// slightly safe 만들떄 댕글링 가능성 없다
+
+pass if to a function 하려면 copy 해야하는데 이건 안됨
+새로 할당도 안됨
+
+copy constructor,m assignment  = delete 처리가 되어있다
+
+
+reference counting
+
+std::shared_ptr<myClass> shared = std::make_shared<myClass>()// 무조건.
+controlblock 만들때 메모리 같이 만들게 해줘서
+
+
+
+
+weak_ptr : checks if alive, but it wont keep it alive
+
+if you need to share : use unique pointer
+
+make_shared
+ - 대상 객체와 제어 블럭을 동시에 메모리 할당하므로 보다 효율적이다
+ - 예외 상황에 좀 더 안전하다
+
+f( shared_ptr<Car>(new Car), foo())
+얘네 만들어지는 순서가 표준으로 언급되어 있지 않다
+
+new Car -> foo()호출 했는데 예외가 나왔다면 : shared<ptr> 호출 못됐다면 자원 누수
+
+f( make_shared<Car>(), foo()) // 이러면 직접 메모리 할당 하지 않아서. 위에 문제 사라진다.
+
+
+
+* 주의 할 점
+Car* p = new Car;
+
+shared_ptr<Car> sp1(p);
+shared_ptr<Car> sp2(p); 
+
+// 각각 따로 제어블록 생성 = 두번 delete
+
+RAII
+resource acquisition is initialization
+
+
+enable_shared_from_this
+
+https://n-learning.ispringlearn.com/content/info/7205?vc_cik=90209863-0siX2-yfCtD-M8xDn&vc_lpid=7205
+CRTP 개념
+
+자기 자신의 참조계수 증가
+
+
+
