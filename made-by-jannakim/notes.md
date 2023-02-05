@@ -301,3 +301,9 @@ https://stackoverflow.com/questions/34560502/why-is-sizeofstdstring-only-eight-b
 https://stackoverflow.com/questions/3770781/why-is-sizeofstring-32#:~:text=So%20this%20string%20implementation%20is,environment%20it%20is%20used%20in.
 
 ![image](https://user-images.githubusercontent.com/74404132/216805982-736e9ae9-ed9b-47bf-895e-c2923a3d972a.png)
+
+
+
+상호 참조 : 자원 누수
+![image](https://user-images.githubusercontent.com/74404132/216806675-9753a4dd-b0af-48ee-a43f-383f0b72a05b.png)
+

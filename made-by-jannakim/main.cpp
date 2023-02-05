@@ -30,7 +30,7 @@ void test_operator_overloads();
 void test_smart_pointer_std();
 void test_smart_pointer_std_advanced();
 void test_smart_pointer_custom();
-
+void test_circular_reference();
 void test_class_with_string_member();
 
 int main()
@@ -43,8 +43,8 @@ int main()
 	// test_smart_pointer_std();
 	//test_smart_pointer_custom();
 	//test_smart_pointer_std_advanced();
-
-	test_class_with_string_member();
+	test_circular_reference();
+	//test_class_with_string_member();
 }
 
 class CString
@@ -203,6 +203,34 @@ void test_class_with_string_member()
 	// new 40
 	// new 8
 	std::cout << std::endl;
+}
+
+class People
+{
+	std::string name;
+
+public:
+	People() {
+		//std::cout << "People()\n";
+	}
+	People( std::string s ) : name( s ) {
+		//std::cout << "People( std::string s )\n";
+	}
+
+	~People() { 
+		std::cout << "~People()\n";
+	}
+
+	std::shared_ptr<People> bf; // best friend
+};
+
+void test_circular_reference()
+{
+	std::shared_ptr<People> pP1 = std::make_shared<People>( "Kim" );
+	std::shared_ptr<People> pP2 = std::make_shared<People>("Lee");
+
+	pP1->bf = pP2;
+	pP2->bf = pP1; // circular reference
 }
 
 class Car
