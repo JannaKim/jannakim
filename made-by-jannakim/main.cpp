@@ -4,6 +4,9 @@
 #include <list>
 #include <memory> // 표준은 아니지만 컴파일러가 global namespace에도 제공함
 #include <thread>
+#include <string>
+#include <utility>
+#include <queue>
 
 #include "JVector.h"
 #include "JList.h"
@@ -28,6 +31,7 @@ void test_smart_pointer_std();
 void test_smart_pointer_std_advanced();
 void test_smart_pointer_custom();
 
+void test_class_with_string_member();
 
 int main()
 {
@@ -38,7 +42,167 @@ int main()
 
 	// test_smart_pointer_std();
 	//test_smart_pointer_custom();
-	test_smart_pointer_std_advanced();
+	//test_smart_pointer_std_advanced();
+
+	test_class_with_string_member();
+}
+
+class CString
+{
+	//long n;
+	std::string s;
+public:
+	CString()
+	{
+
+	}
+};
+
+void* g_allocated_address;
+
+std::queue<std::pair<size_t, void*>> g_AllocInfo;
+bool bQueueAlloc = true;
+void* operator new ( size_t size )
+{
+	
+	void* p = malloc( size );
+	if ( bQueueAlloc )
+		return p;
+
+	std::cout << "New operator overloading," << size << " " << p << std::endl;
+	g_allocated_address = p;
+	bQueueAlloc = true;
+	g_AllocInfo.push( std::make_pair( size, p ) );
+	bQueueAlloc = false;
+	return p;
+}
+
+void print_alloc_info()
+{
+	std::cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ" << std::endl;
+	std::cout << "allocated info :\n";
+	while ( !g_AllocInfo.empty() ) {
+		auto info = g_AllocInfo.front();
+
+		unsigned char const* pos = (unsigned char const*)info.second;
+		std::cout << info.second << " : size" << (long)info.first << std::endl;
+		for ( auto i = 0; i < (long)info.first; i++ )
+			printf( "|%2.2x| ", pos[ i ] );
+
+		g_AllocInfo.pop();
+		std::cout << std::endl;
+	}
+	std::cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ" << std::endl;
+}
+
+void operator delete( void* p )
+{
+	std::cout << "Delete operator overloading\n";
+	free( p );
+}
+
+void test_class_with_string_member()
+{
+	bQueueAlloc = false;
+	print( "> std::string name(15, 'A');" );
+	std::string name( 15, 'A' ); 
+	// new 8 :  74 f9 bd 00 00 00 00 00  주소저장용  8 byte 할당된다 : 주소 들어가보면
+	// ?? ?? ?? ?? 41 41 41 41 41 41 41 41 41 41 41 41 41 41 41 00 0f(크기 15)
+
+	print_alloc_info();
+	&name;
+	std::cout << "&name : " << &name << std::endl;
+	unsigned char const* pos = (unsigned char const*)&name;
+	std::cout << " &name 에 들어 있는 값 : " << std::endl;
+	for ( int i = 0; i < sizeof( name ); i++ )
+		printf( "|%2.2x| ", pos[ i ] );
+
+	std::cout << "\n\n\n";
+
+
+
+	print( "> std::string name2( 31, 'A' );" );
+	std::string name2( 31, 'A' );
+	// new 8 : 64 f6 0f 01 00 00 00 00
+	// new 32 : 0x0151b368 
+	print_alloc_info();
+
+	std::cout << "&name2 : " << &name2 << std::endl;
+	unsigned char const* pos3 = (unsigned char const*)&name2;
+	std::cout << " &name2 에 들어 있는 값 : " << std::endl;
+	for ( int i = 0; i < sizeof( name2 ); i++ )
+		printf( "|%2.2x| ", pos3[ i ] );
+
+	std::cout << "\n\n\n";
+
+	// 31 > 15 이라서 _Reallocate_for 탄다.
+	/*
+	_CONSTEXPR20_CONTAINER basic_string& assign( _CRT_GUARDOVERFLOW const size_type _Count, const _Elem _Ch ) {
+		// assign _Count * _Ch
+		if ( _Count <= _Mypair._Myval2._Myres ) {
+			_Elem* const _Old_ptr = _Mypair._Myval2._Myptr();   // new로 할당한 8byte에 담긴 주소를 가리키는 포인터
+			_Mypair._Myval2._Mysize = _Count;
+			_Traits::assign( _Old_ptr, _Count, _Ch );
+			_Traits::assign( _Old_ptr[ _Count ], _Elem() );
+			return *this;
+		}
+
+		return _Reallocate_for(
+			_Count,
+			[]( _Elem* const _New_ptr, const size_type _Count, const _Elem _Ch ) {
+				_Traits::assign( _New_ptr, _Count, _Ch );
+				_Traits::assign( _New_ptr[ _Count ], _Elem() );
+			},
+			_Ch );
+	}
+
+	_Construct_in_place(_Mypair._Myval2._Bx._Ptr, _New_ptr);
+
+	*/
+
+	std::string name3( 63, 'A' );
+	// new 8
+	// new 64
+	print_alloc_info();
+	std::cout << std::endl;
+
+	std::string name4();
+	// nothing
+	std::cout << std::endl;
+
+	std::cout << "Size of obj name is = " << sizeof( name ) << std::endl;
+	// You are outputting the size of a std::string object, not the contents of 'em
+	// 28
+	std::cout << std::endl;
+
+	std::cout << "Size of std::string is = " << sizeof( std::string ) << std::endl;
+	// You are outputting the size of a std::string object, not the contents of 'em
+	// 28
+	std::cout << std::endl;
+
+	CString e;
+	// new 8
+	std::cout << std::endl;
+
+	std::cout << "Size of CString is = " << sizeof( CString ) << std::endl;
+	// 28
+	std::cout << std::endl;
+
+	CString* cs = new CString(); // empty class size = 1, 디폴트 생성자 따로 선언해도 1
+	// new 28
+	// new 8
+	std::cout << std::endl;
+
+	std::shared_ptr<CString> cs2( new CString );
+	// new 28
+	// new 8
+	// new 16
+	std::cout << std::endl;
+
+	std::shared_ptr<CString> cs3 = std::make_shared<CString>();
+	// new 40
+	// new 8
+	std::cout << std::endl;
 }
 
 class Car
@@ -106,6 +270,7 @@ public:
 
 void test_smart_pointer_std_advanced()
 {
+
 	{
 		std::shared_ptr<Worker> myWorker = std::make_shared<Worker>();
 		myWorker->Run();                                                   // 1
@@ -114,19 +279,6 @@ void test_smart_pointer_std_advanced()
 	
 	// Blocks the current thread until the thread identified by *this finishes its execution.
 
-}
-
-// delete 오버로딩?
-void* operator new ( size_t size )
-{
-	std::cout << "New operator overloading, new size :" << size << std::endl;
-	return malloc( size );
-}
-
-void operator delete( void* p )
-{
-	std::cout << "Delete operator overloading\n";
-	free( p );
 }
 
 void foo( Car* p )

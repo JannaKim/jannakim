@@ -286,3 +286,18 @@ CRTP 개념
 
 
 
+std::string name; 는 8 크기 할당
+
+sizeof( std::string ) == 28
+
+class MyClass { std::string s; };
+sizeof( MyClass ) == 28
+
+new MyClass 하면 28, 8 두개 할당
+
+
+
+https://stackoverflow.com/questions/34560502/why-is-sizeofstdstring-only-eight-bytes
+https://stackoverflow.com/questions/3770781/why-is-sizeofstring-32#:~:text=So%20this%20string%20implementation%20is,environment%20it%20is%20used%20in.
+
+![image](https://user-images.githubusercontent.com/74404132/216805982-736e9ae9-ed9b-47bf-895e-c2923a3d972a.png)
