@@ -7,7 +7,8 @@
 #include <string>
 #include <utility>
 #include <queue>
-
+#include <cstdio>
+#include <vector>
 #include "JVector.h"
 #include "JList.h"
 #include "JSort.h"
@@ -32,6 +33,8 @@ void test_smart_pointer_std_advanced();
 void test_smart_pointer_custom();
 void test_circular_reference();
 void test_class_with_string_member();
+void test_thread_std();
+void test_thread_std_modoocode();
 
 int main()
 {
@@ -43,8 +46,108 @@ int main()
 	// test_smart_pointer_std();
 	//test_smart_pointer_custom();
 	//test_smart_pointer_std_advanced();
-	test_circular_reference();
+	//test_circular_reference();
 	//test_class_with_string_member();
+	//test_thread_std();
+	test_thread_std_modoocode();
+}
+
+void func1() 
+{
+	for ( int i = 0; i < 10; ++i ) {
+		std::thread::id id = std::this_thread::get_id();
+		std::cout << id << std::endl;
+	}
+}
+
+void func2()
+{
+	for ( int i = 0; i < 10; ++i ) {
+		std::thread::id id = std::this_thread::get_id();
+		std::cout << id << std::endl;
+	}
+}
+
+void func3()
+{
+	for ( int i = 0; i < 10; ++i ) {
+		std::thread::id id = std::this_thread::get_id();
+		std::cout << id << std::endl;
+	}
+}
+
+void worker( std::vector<int>::iterator start, std::vector<int>::iterator end, int* result )
+{
+	int sum = 0;
+	for ( auto it = start; it < end; ++it ) {
+		sum += *it;
+	}
+	*result = sum;
+	std::thread::id id = std::this_thread::get_id();
+	printf( "id : %x, sum of %d ~ %d = %d\n", id, *start, *(end-1), *result );
+}
+void test_thread_std_modoocode()
+{
+	
+	//std::thread t1( func1 );
+	//std::thread t2( func2 );
+	//std::thread t3( func3 );
+
+	//t1.join();
+	//t2.join();
+	//t3.join();
+	std::vector<int> vData;
+	for ( int i = 0; i < 10000; ++i )
+		vData.push_back( i );
+
+	std::vector<int> partial_sums;
+
+	std::vector<std::thread> workers;
+	for ( int i = 0; i < 4; ++i ) {
+		partial_sums.push_back( 0 );
+		workers.push_back( std::thread( worker, vData.begin() + i * 2500, vData.begin() + ( i + 1 ) * 2500, &partial_sums[ i ] ) );
+	}
+	for ( int i = 0; i < 4; ++i )
+		workers[ i ].join();
+
+	int total{};
+	for ( auto it : vData )
+		total += it;
+
+	std::cout << " total sum " << total << std::endl;
+}
+void foo_thread()
+{
+	std::thread::id id = std::this_thread::get_id();
+	std::cout << id << "\n";
+	std::cout << "thread start\n";
+	std::this_thread::sleep_for( std::chrono::seconds( 2 ) );
+	std::cout << "thread end\n";
+}
+void test_thread_std()
+{
+	//thread::id id = this_thread::get_id();
+
+	//this_thread::sleep_for( 3s );
+	//this_thread::sleep_until( chrono::system_clock::now() + 3s );
+	//this_thread::yield();
+
+	std::thread t( &foo_thread );
+	t.join();
+}
+
+void* operator new ( size_t size )
+{
+	void* p = malloc( size );
+	//std::cout << "New operator overloading," << size << " " << p << std::endl;
+
+	return p;
+}
+
+void operator delete( void* p )
+{
+	//std::cout << "Delete operator overloading\n";
+	free( p );
 }
 
 class CString
@@ -62,20 +165,21 @@ void* g_allocated_address;
 
 std::queue<std::pair<size_t, void*>> g_AllocInfo;
 bool bQueueAlloc = true;
-void* operator new ( size_t size )
-{
-	
-	void* p = malloc( size );
-	if ( bQueueAlloc )
-		return p;
-
-	std::cout << "New operator overloading," << size << " " << p << std::endl;
-	g_allocated_address = p;
-	bQueueAlloc = true;
-	g_AllocInfo.push( std::make_pair( size, p ) );
-	bQueueAlloc = false;
-	return p;
-}
+//void* operator new ( size_t size )
+//{
+//	void* p = malloc( size );
+//	
+//	
+//	if ( bQueueAlloc )
+//		return p;
+//	std::cout << "New operator overloading," << size << " " << p << std::endl;
+//	
+//	g_allocated_address = p;
+//	bQueueAlloc = true;
+//	g_AllocInfo.push( std::make_pair( size, p ) );
+//	bQueueAlloc = false;
+//	return p;
+//}
 
 void print_alloc_info()
 {
@@ -95,11 +199,7 @@ void print_alloc_info()
 	std::cout << "�ѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤѤ�" << std::endl;
 }
 
-void operator delete( void* p )
-{
-	std::cout << "Delete operator overloading\n";
-	free( p );
-}
+
 
 void test_class_with_string_member()
 {
@@ -166,7 +266,7 @@ void test_class_with_string_member()
 	print_alloc_info();
 	std::cout << std::endl;
 
-	std::string name4();
+	//std::string name4();
 	// nothing
 	std::cout << std::endl;
 

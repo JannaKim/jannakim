@@ -305,5 +305,54 @@ https://stackoverflow.com/questions/3770781/why-is-sizeofstring-32#:~:text=So%20
 
 
 상호 참조 : 자원 누수
+
 ![image](https://user-images.githubusercontent.com/74404132/216806675-9753a4dd-b0af-48ee-a43f-383f0b72a05b.png)
+
+
+해결 : weak_ptr
+
+
+
+std::ratio 
+chrono 라이브러리의 ratio 템플릿
+ : 컴파일 시간에 분수 값을 나타내는 템플릿
+
+내부적으로 2개의 static member data에 약분해서 들어가나
+static constexpr. 실행시간에 보관하는 건 없다
+
+ratio_add< ratio<1,4>, ratio<4,2> > r; // 3/4
+
+milli m;
+kilo k ; // 이것들을 duration 에 사용할 수 있다
+
+duration
+
+duration<double, ratio<1,1>> d1(3); // 3m
+
+duration<double, milli> d2(d1); // milli 3000
+duration<double, kilo> d3(d1); // 0.003 km
+
+
+
+
+std::thread
+C++11 부터 더이상 멀티쓰레딩을 위해 시스템콜을 사용하지 않고
+std::thread 이용하면 된다
+
+#include<thread> 안에 this_thread 라는 namespace가 있다
+ : 멀티쓰레드와 관련된 4개의 멤버함수를 제공해준다
+
+1. get_id : 현 쓰레드 아이디 값 반환
+ thread namespace의 id type으로 받아야 한다
+
+2. sleep_for
+3s, 3min 등으로 사용
+
+3. sleep_until
+이 시간 까지 재움
+
+4. yield
+현재 쓰레드에 남은 시간에 있더라도 포기하고 다른 스레드가 실행할 수 있게 해달라
+
+
 
