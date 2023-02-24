@@ -95,25 +95,25 @@ public:
 		}
 
 		//복사 생성자
-		iterator( const iterator& it )
-		{
-			pNode = it.pNode;
-		}
+		//iterator( const iterator& it )
+		//{
+		//	pNode = it.pNode;
+		//}
 
-		//대입 연산자
-		node<T>* operator=( const iterator& it )
-		{
-			pNode = it.pNode;
-			return pNode;
-		}
+		////대입 연산자
+		//node<T>& operator=( const iterator& it )
+		//{
+		//	pNode = it.pNode;
+		//	return *pNode;
+		//}
 
 		//대입 연산자2
-		node<T>* operator=( const T& val ) // 쓰이지 않으면 디버깅이 안잡힌다
+		node<T>& operator=( const T& val ) // 쓰이지 않으면 디버깅이 안잡힌다
 		{
 			// prev, next 그대로, 내용물만 바꿈
 			// iterator는 포인터 취급당하는데, 포인터는 이렇게 쓰이지 않음. 안좋은 방식
 			pNode->mData = val;
-			return pNode;
+			return *pNode;
 		}
 
 		iterator& operator++()

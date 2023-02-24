@@ -13,6 +13,8 @@
 #include "JList.h"
 #include "JSort.h"
 #include "JMemory.h"
+#include <cstdio>
+#include "MathLibrary.h"
 
 template < class T >
 void print( T line )
@@ -22,6 +24,8 @@ void print( T line )
 	//std::cout << line.a << std::endl;
 	//std::cout << line[0] << std::endl;
 	//std::cout << *line[ 0 ] << std::endl;// operator TESTRVRef* () -> long& operator*()
+
+
 }
 
 void test_JVector();
@@ -35,11 +39,12 @@ void test_circular_reference();
 void test_class_with_string_member();
 void test_thread_std();
 void test_thread_std_modoocode();
+void test_cout();
 
 int main()
 {
 	//test_JVector();
-	//test_JList();
+	test_JList();
 	//test_JList2();
 	// test_operator_overloads();
 
@@ -49,7 +54,53 @@ int main()
 	//test_circular_reference();
 	//test_class_with_string_member();
 	//test_thread_std();
-	test_thread_std_modoocode();
+	//test_thread_std_modoocode();
+
+	//double a = 7.4;
+	//int b = 99;
+
+	//std::cout << "a + b = " <<
+	//	MathLibrary::Arithmetic::Add( a, b ) << std::endl;
+
+	//const char* name = u8"Janna"; // 1 byte
+
+	//const wchar_t* name2 = L"Janna"; // 2byte
+
+	//const char16_t* name3 = u"Janna"; // 2 byte
+	//const char32_t* name4 = U"Janna";
+
+	//{
+	//	std::string name = "cherno";
+	//}
+	//test_cout();
+
+	std::list<long> lTest(1);
+	std::list<long>::iterator it = lTest.begin();
+	it = lTest.begin();
+}
+
+class ostream // cout 은 stream 타입의 객체이다
+{
+public:
+	ostream& operator<<( int n ) {
+		printf( "%d", n );
+		return *this;
+	}
+	ostream& operator<<( double d ) {
+		printf( "%f", d );
+		return *this; // "자신의 참조" 를 반환
+	}
+};
+
+void test_cout()
+{
+	ostream cout;
+	cout << 3; // cout.operator<<(3)
+	cout << 4 << 3.14;
+
+	cout.operator<<( 1 ).operator<<(2).operator<<(3);
+
+	std::wcout << L"Hello World";
 }
 
 void func1() 
@@ -139,14 +190,14 @@ void test_thread_std()
 void* operator new ( size_t size )
 {
 	void* p = malloc( size );
-	//std::cout << "New operator overloading," << size << " " << p << std::endl;
+	std::cout << "New operator overloading," << size << " " << p << std::endl;
 
 	return p;
 }
 
 void operator delete( void* p )
 {
-	//std::cout << "Delete operator overloading\n";
+	std::cout << "Delete operator overloading\n";
 	free( p );
 }
 
@@ -163,8 +214,8 @@ public:
 
 void* g_allocated_address;
 
-std::queue<std::pair<size_t, void*>> g_AllocInfo;
-bool bQueueAlloc = true;
+//std::queue<std::pair<size_t, void*>> g_AllocInfo;
+//bool bQueueAlloc = true;
 //void* operator new ( size_t size )
 //{
 //	void* p = malloc( size );
@@ -185,17 +236,17 @@ void print_alloc_info()
 {
 	std::cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ" << std::endl;
 	std::cout << "allocated info :\n";
-	while ( !g_AllocInfo.empty() ) {
-		auto info = g_AllocInfo.front();
+	//while ( !g_AllocInfo.empty() ) {
+	//	auto info = g_AllocInfo.front();
 
-		unsigned char const* pos = (unsigned char const*)info.second;
-		std::cout << info.second << " : size" << (long)info.first << std::endl;
-		for ( auto i = 0; i < (long)info.first; i++ )
-			printf( "|%2.2x| ", pos[ i ] );
+	//	unsigned char const* pos = (unsigned char const*)info.second;
+	//	std::cout << info.second << " : size" << (long)info.first << std::endl;
+	//	for ( auto i = 0; i < (long)info.first; i++ )
+	//		printf( "|%2.2x| ", pos[ i ] );
 
-		g_AllocInfo.pop();
-		std::cout << std::endl;
-	}
+	//	g_AllocInfo.pop();
+	//	std::cout << std::endl;
+	//}
 	std::cout << "ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ" << std::endl;
 }
 
@@ -203,7 +254,17 @@ void print_alloc_info()
 
 void test_class_with_string_member()
 {
-	bQueueAlloc = false;
+	//bQueueAlloc = false;
+
+	{
+		std::string name = "cherno";
+	}
+	const char* s1 =
+		R"(
+		_CONSTEXPR20_CONTAINER basic_string
+		)";
+
+	
 	print( "> std::string name(15, 'A');" );
 	std::string name( 15, 'A' ); 
 	// new 8 :  74 f9 bd 00 00 00 00 00  주소저장용  8 byte 할당된다 : 주소 들어가보면
@@ -236,10 +297,11 @@ void test_class_with_string_member()
 	std::cout << "\n\n\n";
 
 	// 31 > 15 이라서 _Reallocate_for 탄다.
-	/*
+	
+	R"(
 	_CONSTEXPR20_CONTAINER basic_string& assign( _CRT_GUARDOVERFLOW const size_type _Count, const _Elem _Ch ) {
 		// assign _Count * _Ch
-		if ( _Count <= _Mypair._Myval2._Myres ) {
+		if ( _Count <= _Mypair._Myval2._Myres ) { // size_type _Myres  = 0; // current storage reserved for string
 			_Elem* const _Old_ptr = _Mypair._Myval2._Myptr();   // new로 할당한 8byte에 담긴 주소를 가리키는 포인터
 			_Mypair._Myval2._Mysize = _Count;
 			_Traits::assign( _Old_ptr, _Count, _Ch );
@@ -257,8 +319,8 @@ void test_class_with_string_member()
 	}
 
 	_Construct_in_place(_Mypair._Myval2._Bx._Ptr, _New_ptr);
-
-	*/
+	)";
+	
 
 	std::string name3( 63, 'A' );
 	// new 8
