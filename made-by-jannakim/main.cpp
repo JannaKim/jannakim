@@ -16,6 +16,10 @@
 #include <cstdio>
 #include "MathLibrary.h"
 
+std::ostream& tab( std::ostream& os );
+std::ostream& space( std::ostream& os );
+std::ostream& enter( std::ostream& os );
+
 template < class T >
 void print( T line )
 {
@@ -43,6 +47,7 @@ void test_cout();
 void test_multiple_inheritance();
 void test_cout_and_user_defined_type();
 void test_custom_endl();
+void test_doubleplus_operator_overloading();
 
 int main()
 {
@@ -83,8 +88,41 @@ int main()
 
 	//test_multiple_inheritance();
 	//test_cout_and_user_defined_type();
-	test_custom_endl();
+	//test_custom_endl();
+	test_doubleplus_operator_overloading();
 }
+
+class Point
+{
+	int x;
+	int y;
+public:
+	Point( int a = 0, int b = 0 ) : x( a ), y( b ) {}
+
+	friend std::ostream& operator<<( std::ostream& os, const Point& pt );
+
+	Point& operator++() {
+		++x;
+		++y;
+		return *this;
+	}
+
+	const Point operator++( int ) {
+		Point tmp( *this );
+		++( *this );
+		return tmp;
+	}
+};
+
+
+void test_doubleplus_operator_overloading()
+{
+	Point p( 1, 1 );
+	Point p1 = ++p;
+	Point p2 = p++;
+	// p++++ 에러내기 : return type const
+}
+
 
 class ostream // cout 은 stream 타입의 객체이다
 {
@@ -154,16 +192,6 @@ void test_custom_endl()
 	cout.operator<<( endl );
 	cout << endl;
 }
-
-class Point
-{
-	int x;
-	int y;
-public:
-	Point( int a = 0, int b = 0 ) : x( a ), y( b ) {}
-
-	friend std::ostream& operator<<( std::ostream& os, const Point& pt );
-};
 
 std::ostream& operator<<( std::ostream& os, const Point& pt ) 
 {
