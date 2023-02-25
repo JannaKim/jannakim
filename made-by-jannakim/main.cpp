@@ -41,6 +41,7 @@ void test_thread_std();
 void test_thread_std_modoocode();
 void test_cout();
 void test_multiple_inheritance();
+void test_cout_and_user_defined_type();
 
 int main()
 {
@@ -79,7 +80,34 @@ int main()
 	//std::list<long>::iterator it = lTest.begin();
 	//it = lTest.begin();
 
-	test_multiple_inheritance();
+	//test_multiple_inheritance();
+	test_cout_and_user_defined_type();
+}
+
+class Point
+{
+	int x;
+	int y;
+public:
+	Point( int a = 0, int b = 0 ) : x( a ), y( b ) {}
+
+	friend std::ostream& operator<<( std::ostream& os, const Point& pt );
+};
+
+std::ostream& operator<<( std::ostream& os, const Point& pt ) 
+{
+	// std::ostream 에 const 안 붙이는 이유 : 상수객체는 상수함수만 부를 수 있는데
+	// os.operator(pt.x) 는 상수함수가 아니어서
+	os << pt.x << pt.y << std::endl;
+	return os;
+}
+
+void test_cout_and_user_defined_type()
+{
+	std::cout << 1; // cout.operator(1);
+
+	Point pt( 1, 2 ); 
+	std::cout << pt; // opeator<<(ostream, Point)
 }
 
 class File
