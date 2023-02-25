@@ -42,6 +42,7 @@ void test_thread_std_modoocode();
 void test_cout();
 void test_multiple_inheritance();
 void test_cout_and_user_defined_type();
+void test_custom_endl();
 
 int main()
 {
@@ -81,7 +82,77 @@ int main()
 	//it = lTest.begin();
 
 	//test_multiple_inheritance();
-	test_cout_and_user_defined_type();
+	//test_cout_and_user_defined_type();
+	test_custom_endl();
+}
+
+class ostream // cout 은 stream 타입의 객체이다
+{
+public:
+	ostream& put( char c ) {
+		printf( "%c", c );
+		return *this;
+	}
+
+	ostream& flush() { return *this;  }// 출력 버퍼 지우기
+
+	ostream& operator<<( int n ) {
+		printf( "%d", n );
+		return *this;
+	}
+	ostream& operator<<( double d ) {
+		printf( "%f", d );
+		return *this; // "자신의 참조" 를 반환
+	}
+
+	ostream& operator<<( ostream& ( *f )( ostream& ) )
+	{
+		f( *this );
+		return *this;
+	}
+};
+
+ostream cout;
+
+ostream& endl( ostream& os )
+{
+	os.put( '\n' );
+	os.flush();
+	return os;
+}
+
+std::ostream& tab( std::ostream& os )
+{
+	os << '\t';
+	return os;
+}
+
+std::ostream& space( std::ostream& os )
+{
+	os.put( ' ' );
+	os.flush();
+	return os;
+}
+
+std::ostream& enter( std::ostream& os )
+{
+	os.put( '\n' );
+	os.flush();
+	return os;
+}
+
+void test_custom_endl()
+{
+	std::cout << std::endl;
+	std::cout.operator<<( std::endl );
+	std::endl( std::cout );
+	
+	std::cout << 'a' << tab << 'b' << enter;
+	std::cout << 'c' << space << 'd';
+	/////////////////////////////////////////////////////////////
+	
+	cout.operator<<( endl );
+	cout << endl;
 }
 
 class Point
@@ -152,19 +223,6 @@ void test_multiple_inheritance()
 	std::cout << file.InputFile::filename << std::endl;
 	std::cout << file.OutputFile::filename << std::endl;
 }
-
-class ostream // cout 은 stream 타입의 객체이다
-{
-public:
-	ostream& operator<<( int n ) {
-		printf( "%d", n );
-		return *this;
-	}
-	ostream& operator<<( double d ) {
-		printf( "%f", d );
-		return *this; // "자신의 참조" 를 반환
-	}
-};
 
 void test_cout()
 {
