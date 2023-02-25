@@ -40,11 +40,12 @@ void test_class_with_string_member();
 void test_thread_std();
 void test_thread_std_modoocode();
 void test_cout();
+void test_multiple_inheritance();
 
 int main()
 {
 	//test_JVector();
-	test_JList();
+	//test_JList();
 	//test_JList2();
 	// test_operator_overloads();
 
@@ -74,9 +75,54 @@ int main()
 	//}
 	//test_cout();
 
-	std::list<long> lTest(1);
-	std::list<long>::iterator it = lTest.begin();
-	it = lTest.begin();
+	//std::list<long> lTest(1);
+	//std::list<long>::iterator it = lTest.begin();
+	//it = lTest.begin();
+
+	test_multiple_inheritance();
+}
+
+class File
+{
+public:
+	std::string filename = "None";
+	virtual void open() {
+		std::cout << "File::open\n";
+	};
+};
+
+class InputFile : virtual public File
+{
+public:
+	void read() {}
+	virtual void open() override {
+		std::cout << "InputFile::open\n";
+	}
+};
+
+class OutputFile : virtual public File
+{
+public:
+	void write();
+	//virtual void open() override {
+	//	std::cout << "OutputFile::open\n";
+	//}
+};
+
+class IOFile : public InputFile, public OutputFile
+{
+public:
+};
+
+
+void test_multiple_inheritance()
+{
+	IOFile file;
+	file.InputFile::open();
+	file.OutputFile::open();
+	file.filename = "Jannakim";
+	std::cout << file.InputFile::filename << std::endl;
+	std::cout << file.OutputFile::filename << std::endl;
 }
 
 class ostream // cout 은 stream 타입의 객체이다
