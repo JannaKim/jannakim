@@ -48,6 +48,7 @@ void test_multiple_inheritance();
 void test_cout_and_user_defined_type();
 void test_custom_endl();
 void test_doubleplus_operator_overloading();
+void test_explicit_bool_operator();
 
 int main()
 {
@@ -89,7 +90,40 @@ int main()
 	//test_multiple_inheritance();
 	//test_cout_and_user_defined_type();
 	//test_custom_endl();
-	test_doubleplus_operator_overloading();
+	// test_doubleplus_operator_overloading();
+	test_explicit_bool_operator();
+}
+
+class Machine
+{
+	int data = 10;
+	bool state = true;
+public:
+	Machine()
+	{
+		std::cout << "Machine\n";
+	}
+	explicit operator bool() { // c++11 부터 제공
+		return state;
+	}
+
+	Machine& operator<<( int a ) {
+		data += a;
+		return *this;
+	}
+};
+void test_explicit_bool_operator()
+{
+	Machine m;
+
+	//bool b1 = m;
+	bool b2 = static_cast<bool>(m);
+	// bool b3 = static_cast<bool&>( m ); //  'static_cast' : 'Machine'에서 'bool & 로 변환할 수 x
+	// m << 10; bool shift 연산자처럼 동작
+	m << 10; // operator<< 가 있다면 먼저 사용
+	if ( m ) { // explicit 변환 연산자로 만들어도 if 문에서는 static_cast 없이 사용할 수 있다
+
+	}
 }
 
 class Point
