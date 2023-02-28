@@ -15,6 +15,7 @@
 #include "JMemory.h"
 #include <cstdio>
 #include "MathLibrary.h"
+#include <functional>
 
 std::ostream& tab( std::ostream& os );
 std::ostream& space( std::ostream& os );
@@ -49,6 +50,7 @@ void test_cout_and_user_defined_type();
 void test_custom_endl();
 void test_doubleplus_operator_overloading();
 void test_explicit_bool_operator();
+void test_perfect_forwarding();
 
 int main()
 {
@@ -91,7 +93,38 @@ int main()
 	//test_cout_and_user_defined_type();
 	//test_custom_endl();
 	// test_doubleplus_operator_overloading();
-	test_explicit_bool_operator();
+	//test_explicit_bool_operator();
+	test_perfect_forwarding();
+}
+
+void foo( int n ) { std::cout << "foo" << enter; }
+void goo( int& r ) 
+{
+	std::cout << "goo" << enter;
+	r = 10; 
+}
+void hoo( int&& r )
+{
+	std::cout << "hoo" << enter;
+	r = 99;
+}
+template<class F, class T>
+void chronometry( F&& f, T&& arg )
+{
+	// 현재 시간 보관
+	f(static_cast<T&&>( arg ) ); // rvalue 캐스팅. std::forward<T>(arg) 랑 같다 
+}
+
+void test_perfect_forwarding()
+{
+	int n = 5;
+	chronometry( foo, n ); // 5
+	std::cout << n << enter;
+	chronometry( goo, n ); // 10
+	std::cout << n << enter;
+	chronometry( hoo, 3 ); // 10
+	std::cout << n << enter;
+
 }
 
 class Machine
@@ -116,7 +149,7 @@ void test_explicit_bool_operator()
 {
 	Machine m;
 
-	//bool b1 = m;
+	//bool b1 = m; 1. .operator=(b1) 먼저 확인, 없으니까 
 	bool b2 = static_cast<bool>(m);
 	// bool b3 = static_cast<bool&>( m ); //  'static_cast' : 'Machine'에서 'bool & 로 변환할 수 x
 	// m << 10; bool shift 연산자처럼 동작
@@ -687,7 +720,7 @@ void test_smart_pointer_std()
 
 	std::shared_ptr<Car> p4 = p3;
 
-	std::shared_ptr<Car> p5( new Car, foo );
+	//std::shared_ptr<Car> p5( new Car, foo );
 	std::shared_ptr<Car> p6( new Car, []( Car* p ) { delete p; } );
 
 
