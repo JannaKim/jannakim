@@ -100,12 +100,15 @@ public:
 		//	pNode = it.pNode;
 		//}
 
-		////대입 연산자
-		//node<T>& operator=( const iterator& it )
-		//{
-		//	pNode = it.pNode;
-		//	return *pNode;
-		//}
+		//대입 연산자
+		iterator& operator=( const iterator& it )
+		{
+			if ( this == &it )
+				return *this;
+
+			pNode = it.pNode;
+			return *this;
+		}
 
 		//대입 연산자2
 		node<T>& operator=( const T& val ) // 쓰이지 않으면 디버깅이 안잡힌다
