@@ -51,6 +51,7 @@ void test_custom_endl();
 void test_doubleplus_operator_overloading();
 void test_explicit_bool_operator();
 void test_perfect_forwarding();
+void test_composite_pattern();
 
 int main()
 {
@@ -94,7 +95,19 @@ int main()
 	//test_custom_endl();
 	// test_doubleplus_operator_overloading();
 	//test_explicit_bool_operator();
-	test_perfect_forwarding();
+	//test_perfect_forwarding();
+	test_composite_pattern();
+}
+
+void test_composite_pattern()
+{
+	// GUI 우클릭 재귀적 메뉴
+	// MenuItem : 선택 시 일
+	// PopupMenu : 하위 메뉴를 열어줌
+
+	vector<MenuItem*> 으로 만들면 PopUpMenu 에 다시 또 PopupMenu를 넣을 수 없다
+
+
 }
 
 void foo( int n ) { std::cout << "foo" << enter; }
