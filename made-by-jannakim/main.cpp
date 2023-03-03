@@ -123,23 +123,29 @@ public:
 	};
 };
 
-template<typename T>
+class FakeLock
+{
+public: // 가상함수로 만들면 비어있어도 실행한다
+	void Lock()
+	{};
+	void Unlock()
+	{};
+};
+
+template<typename T, typename ThreadModel = NoLock >
 class List
 {
-	ISync* pSync = 0;
+	ThreadModel tm;
 
 public:
-	void set_lock( ISync* p ) { pSync = p; }
-
 	void push_front( const T& a )
 	{
-		if ( pSync ) pSync->Lock(); // 가상함수라서 성능저하가 있을 수 있다 : 콜에 대한 오버헤드
+		tm.Lock(); // 가상함수라서 성능저하가 있을 수 있다 : 콜에 대한 오버헤드
 		// ...
 		std::cout << "push_front" << enter;
-		if ( pSync ) pSync->Unlock();
+		tm.Unlock();
 	}
 	~List() {
-		delete pSync;
 	}
 };
 
@@ -147,11 +153,11 @@ public:
 void test_policy_based_design()
 {
 	// 패턴 적용 전
-	List<long> l;
-	MutexLock* m = new MutexLock();
-	l.set_lock( m );
-
+	List<long, MutexLock> l;
 	l.push_front(1);
+
+	List<long, FakeLock> l2;
+	l2.push_front( -1 );
 }
 
 
