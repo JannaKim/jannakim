@@ -52,6 +52,7 @@ void test_doubleplus_operator_overloading();
 void test_explicit_bool_operator();
 void test_perfect_forwarding();
 void test_composite_pattern();
+void test_policy_based_design();
 
 int main()
 {
@@ -97,7 +98,62 @@ int main()
 	//test_explicit_bool_operator();
 	//test_perfect_forwarding();
 	test_composite_pattern();
+	test_policy_based_design();
 }
+
+class ISync
+{
+public:
+	virtual void Lock() = 0; // 가상함수는 인라인 치환이 안된다. 뭘로 결정날지 알수 없어서
+	virtual void Unlock() = 0;
+	virtual ~ISync() {} // 가상함수가 하나라도 있으면 
+};
+
+class MutexLock : public ISync
+{
+	// Mutex mutex;
+public:
+	virtual void Lock() override 
+	{
+		std::cout << "lock" << enter;
+	};
+	virtual void Unlock() override 
+	{
+		std::cout << "unlock" << enter;
+	};
+};
+
+template<typename T>
+class List
+{
+	ISync* pSync = 0;
+
+public:
+	void set_lock( ISync* p ) { pSync = p; }
+
+	void push_front( const T& a )
+	{
+		if ( pSync ) pSync->Lock(); // 가상함수라서 성능저하가 있을 수 있다 : 콜에 대한 오버헤드
+		// ...
+		std::cout << "push_front" << enter;
+		if ( pSync ) pSync->Unlock();
+	}
+	~List() {
+		delete pSync;
+	}
+};
+
+// 단위 전략 패턴
+void test_policy_based_design()
+{
+	// 패턴 적용 전
+	List<long> l;
+	MutexLock* m = new MutexLock();
+	l.set_lock( m );
+
+	l.push_front(1);
+}
+
 
 void test_composite_pattern()
 {
@@ -106,7 +162,7 @@ void test_composite_pattern()
 	// MenuItem : 선택 시 일
 	// PopupMenu : 하위 메뉴를 열어줌
 
-	vector<MenuItem*> 으로 만들면 PopUpMenu 에 다시 또 PopupMenu를 넣을 수 없다
+	//vector<MenuItem*> 으로 만들면 PopUpMenu 에 다시 또 PopupMenu를 넣을 수 없다
 
 
 }

@@ -117,3 +117,40 @@ State Pattern : 객체 자신의 내부 상태에 따라 행위(동작)을 변�
 
 Strategy : 다양한 알고리즘이 존재하면 이들 각각을 하나의 클래스로 캡슐화 하여
 알고리즘의 대체가 가능하도록 한다
+
+클래스 다이어그램 상으론 완벽히 동일하게 그려진다
+
+state는 동작을, strategy 는 알고리즘을 바꿀때 그렇게 불린다.
+
+
+[State Pattern] summery
+변하지 않은 코드에서 변해야 하는 부분은 분리 되어야 한다.
+
+
+1. 일반 함우세어 변하는 건 함수 인자로 분리 : 함수 포인터, 함수 객체, 람다
+
+2. 멤버 함수에서 변하는 건
+템플릿 메소드 : 상속 기반, 재사용 불가, 실행 시간 교체 불가
+ : 근데 바뀌는 거 여러가지면 상속해서 바뀌는 게 좋음
+
+정책 클래스 교체
+전략, 상태 : 인터페이스로, 실행시간이지만 가상함수라서 느림
+Policy Base Design : 템플리 인자로, 실행시간 교체 불가능, 인라인 치환 가능, 빠름
+
+
+[PolicyBase & Application Framwork] policy base
+
+
+List<int> s; // 멀티 스레드에 안전하지 않다
+
+template< typename T> class List
+{
+    ISync* pSync = 0;
+public:
+    void push_front(const T& a)
+    {
+        if ( pSync ) pSync->Lock();
+        // ...
+        if ( pSync ) pSync->Unlock(); // 괜히 부르면 성능이 저하된다 : 사용자가 쓸지 안쓸지 선택할 수 있게 한다
+    }
+}
