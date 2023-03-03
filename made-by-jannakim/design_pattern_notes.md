@@ -96,3 +96,24 @@ public:
 };
 
 AddStudentMenu m1( "Add Student ", 11);
+
+
+방법 1 : 하는 일을 가상함수로 분리
+단점 : 파생클래스의 개수가 너무 많아진다
+
+virtual void command()
+{
+    doCommand(); <- 변해야하는 것만 가상함수로
+}
+
+방법 2 : strategy 패턴
+
+
+
+state # 1 상태와 전략의 차이
+
+State Pattern : 객체 자신의 내부 상태에 따라 행위(동작)을 변경하도록 한다
+객체는 마치 클래스를 바꾸는 것 처럼 보인다
+
+Strategy : 다양한 알고리즘이 존재하면 이들 각각을 하나의 클래스로 캡슐화 하여
+알고리즘의 대체가 가능하도록 한다

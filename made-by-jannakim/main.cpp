@@ -101,6 +101,7 @@ int main()
 
 void test_composite_pattern()
 {
+	 // making menu #
 	// GUI 우클릭 재귀적 메뉴
 	// MenuItem : 선택 시 일
 	// PopupMenu : 하위 메뉴를 열어줌
