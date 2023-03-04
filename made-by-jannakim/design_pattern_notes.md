@@ -230,3 +230,20 @@ v.push_back(&tv); // error
 어댑터 종류: 클래스 어댑터, 객체 어댑터
 
 
+
+[Adapter 패턴] STL Container Adapter
+
+Sequence Container 의 인터페이스를 수정
+
+ZArray = std::vector 가능하려면?
+
+
+
+[Proxy 패턴] Proxy #1
+
+Proxy 패턴을 사용한 IPC 계산기 예제 첫번째
+
+
+어떤 객체에 대한 접근을 제어하기 위한 용도로
+대리인이나 대변인에 해당하는 객체를 제공하는 패턴
+

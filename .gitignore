@@ -248,3 +248,10 @@ ModelManifest.xml
 /made-by-jannakim/*.sln
 /made-by-jannakim/made-by-jannakim.vcxproj
 /made-by-jannakim/made-by-jannakim.vcxproj.filters
+/IPCServerManager/*.sln
+/IPCServerManager/*.vcxproj
+/IPCServerManager/*.filters
+/IPClientManager/*.vcxproj
+/IPClientManager/*.filters
+/MathLibrary/*.vcxproj
+/MathLibrary/*.filters

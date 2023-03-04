@@ -55,6 +55,7 @@ void test_composite_pattern();
 void test_policy_based_design();
 void test_function_pointer();
 void test_adapter_pattern();
+void test_proxy_pattern();
 
 int main()
 {
@@ -103,7 +104,16 @@ int main()
 	//test_policy_based_design();
 
 	//test_function_pointer();
-	test_adapter_pattern();
+	//test_adapter_pattern();
+	//test_proxy_pattern();
+}
+
+void test_proxy_pattern()
+{
+	//  ec_start_server( std::string( "CalcService" ), dispatch );
+	// 서버가 클라이언트 접속 대기중
+
+
 }
 
 class Shape
@@ -126,7 +136,7 @@ public:
 };
 class ObjectAdapter : public Shape
 {
-	TextView* pView; // 포인터가 핵심 : 이미 존재하는 객체를 받는 거라서
+	TextView* pView; // 포인터가 핵심 : 이미 존재하는 객체를 받는 거라서. 포인터 없이 받으면 클래스 어댑터가 된다 
 public:
 	ObjectAdapter( TextView* p ) : pView( p ) {}
 
