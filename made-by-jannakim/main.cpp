@@ -54,6 +54,7 @@ void test_perfect_forwarding();
 void test_composite_pattern();
 void test_policy_based_design();
 void test_function_pointer();
+void test_adapter_pattern();
 
 int main()
 {
@@ -101,7 +102,45 @@ int main()
 	//test_composite_pattern();
 	//test_policy_based_design();
 
-	test_function_pointer();
+	//test_function_pointer();
+	test_adapter_pattern();
+}
+
+class Shape
+{
+public:
+	virtual void Draw() 
+	{
+		std::cout << "Shape::Draw\n";
+	}
+};
+
+class TextView
+{
+	std::string s;
+public:
+	TextView( std::string s ) : s( s ) {}
+	void Show() {
+		std::cout << s << enter;
+	}
+};
+class ObjectAdapter : public Shape
+{
+	TextView* pView; // 포인터가 핵심 : 이미 존재하는 객체를 받는 거라서
+public:
+	ObjectAdapter( TextView* p ) : pView( p ) {}
+
+	virtual void Draw() override { pView->Show();  }
+};
+
+void test_adapter_pattern()
+{
+	vector<Shape*> v;
+	TextView tv( "world" );
+	v.push_back( new ObjectAdapter( &tv ) );
+
+	for ( auto& p : v )
+		p->Draw();
 }
 
 class ComboBox

@@ -160,3 +160,73 @@ public:
 단위 기반 패턴은 컴파일 시간 정책이라서 실행시간에 교체할 수 없고,
 전략처럼 순수 가상함수가 있는 기반 클래스가 없어서
 구현이 되어야할 걸 문서화 해놔야한다
+
+
+
+menu event # 2
+
+하나의 포인터에 멤버함수, 일반함수 모두 담기
+
+void(*f1)() = &foo;
+
+void(Dialog::*f2)() = &Dialog::Close;
+
+클래스 템플릿을 생성하는 함수 템플릿을 만든다
+
+
+
+menu event # 3
+
+function<void()> f;
+f = &foo;
+f();
+
+Dialog dlg;
+
+f = bind(&Dialog::Close, &dlg);
+f();
+
+f = bind(&goo, 5);
+f();
+
+You can pass extra parameters to the function object returned from bind. They are silently ignored
+
+
+menu event # 2
+
+function 템플릿 : 
+
+일반 함수, 멤버 함수, 람다 표현식, 함수 객체 등을 모두 담을 수 있다
+
+
+
+[Adapter 패턴 개념]
+
+Adapter 패턴 : 
+
+한 클래스(또는 객체)의 인터페이스를 클라이언트가 사용하고자 하는 다른 인터페이스로 변환 한다
+
+호환성 대문에 사용할 수 없었던 클래스들을 연결해서 사용할 수 있다
+
+
+class Text : public TextView, public Shape
+{
+    public:
+        Text( std::string s ) : TextView(s) {}
+
+        virtual void Draw() { TextView::Show(); }
+};
+
+
+Text t("Hello");
+
+vector<Shape*> v;
+
+v.push_back(&t);
+
+Textview tv("world")' // 이게 들어가려면?
+v.push_back(&tv); // error
+
+어댑터 종류: 클래스 어댑터, 객체 어댑터
+
+
