@@ -1,4 +1,6 @@
+#include <iostream>
 #include "ecourse_dp.hpp"
+#include "..\CalcProxy\ICalc.h"
 using namespace std;
 using namespace ecourse;
 
@@ -8,14 +10,12 @@ int main()
 test_proxy_pattern();
 }
 
-
-class Calc
+class Calc : public ICalc
 {
 public:
 	int Add( int a, int b ) { return a + b; }
 	int Sub( int a, int b ) { return a - b; }
 };
-
 Calc calc;
 
 int dispatch( int code, int x, int y )
