@@ -53,6 +53,7 @@ void test_explicit_bool_operator();
 void test_perfect_forwarding();
 void test_composite_pattern();
 void test_policy_based_design();
+void test_function_pointer();
 
 int main()
 {
@@ -97,8 +98,42 @@ int main()
 	// test_doubleplus_operator_overloading();
 	//test_explicit_bool_operator();
 	//test_perfect_forwarding();
-	test_composite_pattern();
-	test_policy_based_design();
+	//test_composite_pattern();
+	//test_policy_based_design();
+
+	test_function_pointer();
+}
+
+class ComboBox
+{
+public:
+	ComboBox() : myTransFunc( nullptr ) {}
+
+	// Defines a function pointer type pointing to a void function with parameters.
+	typedef void ( *TransFunc )( std::string, std::vector<std::pair<std::string, std::string>> );
+	//  Actually defines a member variable of this type.
+	TransFunc myTransFunc;
+
+	void Do()
+	{
+		// Uses the member variable to call a supplied function.
+		if ( myTransFunc )
+			( *myTransFunc )( "Hello", container );
+	}
+
+	std::vector<std::pair<std::string, std::string>> container;
+};
+
+void Gather( std::string s, std::vector<std::pair<std::string, std::string>> container )
+{
+	std::cout << s << enter;
+}
+void test_function_pointer()
+{
+	ComboBox* cb = new ComboBox();
+	cb->myTransFunc = Gather; // // Assigns the member function pointer to an actual function.
+
+	cb->Do();
 }
 
 class ISync
