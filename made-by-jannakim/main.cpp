@@ -17,6 +17,7 @@
 #include "MathLibrary.h"
 #include <functional>
 
+#pragma comment(lib, "Winmm.lib") //winmm.lib 추가
 std::ostream& tab( std::ostream& os );
 std::ostream& space( std::ostream& os );
 std::ostream& enter( std::ostream& os );
@@ -55,10 +56,38 @@ void test_composite_pattern();
 void test_policy_based_design();
 void test_function_pointer();
 void test_adapter_pattern();
-void test_proxy_pattern();
+void test_bridge_pattern();
+
+struct RecordTime
+{
+	inline static std::list<LONG> lGap;
+	inline static LONG tTime;
+
+	inline bool operator()()
+	{
+		LONG tCur = ::timeGetTime();
+		if ( RecordTime::tTime )
+			RecordTime::lGap.emplace_back( tCur - RecordTime::tTime );
+		RecordTime::tTime = tCur;
+
+		return true;
+	}
+
+	static void Log()
+	{
+		for ( LONG interval : IntervalRecorder::m_lInterval )
+			std::cout << interval << " ";
+	}
+};
 
 int main()
 {
+	RecordTime RecordTimeTaken;
+	RecordTimeTaken();
+	RecordTimeTaken();
+	RecordTimeTaken();
+	RecordTimeTaken::Log();
+
 	//test_JVector();
 	//test_JList();
 	//test_JList2();
@@ -105,14 +134,18 @@ int main()
 
 	//test_function_pointer();
 	//test_adapter_pattern();
-	//test_proxy_pattern();
+	//test_bridge_pattern();
 }
 
-void test_proxy_pattern()
+struct IMP3
 {
-	//  ec_start_server( std::string( "CalcService" ), dispatch );
-	// 서버가 클라이언트 접속 대기중
+	virtual void Play() = 0;
+	virtual void Stop() = 0;
+	virtual ~IMP3() {}
+};
 
+void test_bridge_pattern()
+{
 
 }
 
@@ -577,14 +610,14 @@ void test_thread_std()
 void* operator new ( size_t size )
 {
 	void* p = malloc( size );
-	std::cout << "New operator overloading," << size << " " << p << std::endl;
+	//std::cout << "New operator overloading," << size << " " << p << std::endl;
 
 	return p;
 }
 
 void operator delete( void* p )
 {
-	std::cout << "Delete operator overloading\n";
+	//std::cout << "Delete operator overloading\n";
 	free( p );
 }
 
